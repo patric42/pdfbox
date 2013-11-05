@@ -69,7 +69,7 @@ public class COSDocument extends COSBase
      * Document trailer dictionary.
      */
     private COSDictionary trailer;
-    
+
     /**
      * Signature interface.
      */
@@ -85,12 +85,12 @@ public class COSDocument extends COSBase
     private String headerString = "%PDF-" + version;
 
     private boolean warnMissingClose = true;
-    
+
     /** signal that document is already decrypted, e.g. with {@link NonSequentialPDFParser} */
     private boolean isDecrypted = false;
-    
+
     private long startXref;
-    
+
     private boolean closed = false;
 
     /**
@@ -108,7 +108,7 @@ public class COSDocument extends COSBase
      * @param forceParsingValue flag to skip malformed or otherwise unparseable
      *                     document content where possible
      */
-    public COSDocument(RandomAccess scratchFileValue, boolean forceParsingValue) 
+    public COSDocument(RandomAccess scratchFileValue, boolean forceParsingValue)
     {
         scratchFile = scratchFileValue;
         tmpFile = null;
@@ -126,7 +126,7 @@ public class COSDocument extends COSBase
      *                     document content where possible
      * @throws IOException if something went wrong
      */
-    public COSDocument(File scratchDir, boolean forceParsingValue) throws IOException 
+    public COSDocument(File scratchDir, boolean forceParsingValue) throws IOException
     {
         tmpFile = File.createTempFile("pdfbox-", ".tmp", scratchDir);
         scratchFile = new RandomAccessFile(tmpFile, "rw");
@@ -138,7 +138,7 @@ public class COSDocument extends COSBase
      *
      *  @throws IOException If there is an error creating the tmp file.
      */
-    public COSDocument() throws IOException 
+    public COSDocument() throws IOException
     {
         this(new RandomAccessBuffer(), false);
     }
@@ -151,7 +151,7 @@ public class COSDocument extends COSBase
      *
      * @throws IOException If there is an error creating the tmp file.
      */
-    public COSDocument(File scratchDir) throws IOException 
+    public COSDocument(File scratchDir) throws IOException
     {
         this(scratchDir, false);
     }
@@ -164,7 +164,7 @@ public class COSDocument extends COSBase
      *
      * @param file The random access file to use for storage.
      */
-    public COSDocument(RandomAccess file) 
+    public COSDocument(RandomAccess file)
     {
         this(file, false);
     }
@@ -173,8 +173,8 @@ public class COSDocument extends COSBase
      * This will get the scratch file for this document.
      *
      * @return The scratch file.
-     * 
-     * 
+     *
+     *
      */
     public RandomAccess getScratchFile()
     {
@@ -192,7 +192,7 @@ public class COSDocument extends COSBase
 
     /**
      * Create a new COSStream using the underlying scratch file.
-     * 
+     *
      * @return the new COSStream
      */
     public COSStream createCOSStream()
@@ -204,7 +204,7 @@ public class COSDocument extends COSBase
      * Create a new COSStream using the underlying scratch file.
      *
      * @param dictionary the corresponding dictionary
-     * 
+     *
      * @return the new COSStream
      */
     public COSStream createCOSStream(COSDictionary dictionary)
@@ -325,7 +325,7 @@ public class COSDocument extends COSBase
     public void setVersion( float versionValue )
     {
         // update header string
-        if (versionValue != version) 
+        if (versionValue != version)
         {
             headerString = headerString.replaceFirst(String.valueOf(version), String.valueOf(versionValue));
         }
@@ -382,13 +382,13 @@ public class COSDocument extends COSBase
 
     /**
      * This will return the signature interface.
-     * @return the signature interface 
+     * @return the signature interface
      */
-    public SignatureInterface getSignatureInterface() 
+    public SignatureInterface getSignatureInterface()
     {
         return signatureInterface;
     }
-    
+
     /**
      * This will set the encryption dictionary, this should only be called when
      * encrypting the document.
@@ -438,7 +438,7 @@ public class COSDocument extends COSBase
                 COSArray fields = (COSArray)acroForm.getDictionaryObject(COSName.FIELDS);
                 if (fields != null)
                 {
-                    // Some fields may contain twice references to a single field. 
+                    // Some fields may contain twice references to a single field.
                     // This will prevent such double entries.
                     HashMap<COSObjectKey, COSDictionary> signatures = new HashMap<COSObjectKey, COSDictionary>();
                     for ( Object object : fields )
@@ -459,7 +459,7 @@ public class COSDocument extends COSBase
         }
         return Collections.emptyList();
     }
-    
+
     /**
      * This will get the document ID.
      *
@@ -479,12 +479,12 @@ public class COSDocument extends COSBase
     {
         getTrailer().setItem(COSName.ID, id);
     }
-    
+
     /**
      * Set the signature interface to the given value.
      * @param sigInterface the signature interface
      */
-    public void setSignatureInterface(SignatureInterface sigInterface) 
+    public void setSignatureInterface(SignatureInterface sigInterface)
     {
         signatureInterface = sigInterface;
     }
@@ -559,10 +559,10 @@ public class COSDocument extends COSBase
      */
     public void close() throws IOException
     {
-        if (!closed) 
+        if (!closed)
         {
             scratchFile.close();
-            if (tmpFile != null) 
+            if (tmpFile != null)
             {
                 tmpFile.delete();
             }
@@ -579,9 +579,9 @@ public class COSDocument extends COSBase
     @Override
     protected void finalize() throws IOException
     {
-        if (!closed) 
+        if (!closed)
         {
-            if (warnMissingClose) 
+            if (warnMissingClose)
             {
                 LOG.warn( "Warning: You did not close a PDF Document" );
             }
@@ -705,9 +705,9 @@ public class COSDocument extends COSBase
     }
 
     /**
-     * This method set the startxref value of the document. This will only 
+     * This method set the startxref value of the document. This will only
      * be needed for incremental updates.
-     * 
+     *
      * @param startXrefValue the value for startXref
      */
     public void setStartXref(long startXrefValue)
@@ -717,7 +717,7 @@ public class COSDocument extends COSBase
 
     /**
      * Return the startXref Position of the parsed document. This will only be needed for incremental updates.
-     * 
+     *
      * @return a long with the old position of the startxref
      */
     public long getStartXref()
@@ -727,7 +727,7 @@ public class COSDocument extends COSBase
 
     /**
      * Determines it the trailer is a XRef stream or not.
-     * 
+     *
      * @return true if the trailer is a XRef stream
      */
     public boolean isXRefStream()

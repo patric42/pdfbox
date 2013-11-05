@@ -54,7 +54,7 @@ public class SetLineCapStyle extends org.apache.pdfbox.util.operator.SetLineCapS
         }
         else
         {
-            drawer.setStroke( new BasicStroke(stroke.getLineWidth(), lineCapStyle, stroke.getLineJoin(), 
+            drawer.setStroke( new BasicStroke(stroke.getLineWidth(), lineCapStyle, stroke.getLineJoin(),
                     stroke.getMiterLimit(), stroke.getDashArray(), stroke.getDashPhase()));
         }
     }

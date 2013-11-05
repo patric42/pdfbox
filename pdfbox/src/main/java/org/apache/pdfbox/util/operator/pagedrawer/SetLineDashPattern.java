@@ -49,9 +49,9 @@ public class SetLineDashPattern extends org.apache.pdfbox.util.operator.SetLineD
         PDLineDashPattern lineDashPattern = context.getGraphicsState().getLineDashPattern();
         PageDrawer drawer = (PageDrawer)context;
         BasicStroke stroke = (BasicStroke)drawer.getStroke();
-        if (stroke == null) 
+        if (stroke == null)
         {
-            if (lineDashPattern.isDashPatternEmpty()) 
+            if (lineDashPattern.isDashPatternEmpty())
             {
                 drawer.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f) );
             }
@@ -61,20 +61,20 @@ public class SetLineDashPattern extends org.apache.pdfbox.util.operator.SetLineD
                         lineDashPattern.getCOSDashPattern().toFloatArray(), lineDashPattern.getPhaseStart()) );
             }
         }
-        else 
+        else
         {
-            if (lineDashPattern.isDashPatternEmpty()) 
+            if (lineDashPattern.isDashPatternEmpty())
             {
-                drawer.setStroke( new BasicStroke(stroke.getLineWidth(), stroke.getEndCap(), 
+                drawer.setStroke( new BasicStroke(stroke.getLineWidth(), stroke.getEndCap(),
                         stroke.getLineJoin(), stroke.getMiterLimit()) );
             }
             else
             {
-                drawer.setStroke( new BasicStroke(stroke.getLineWidth(), stroke.getEndCap(), stroke.getLineJoin(), 
-                        stroke.getMiterLimit(), lineDashPattern.getCOSDashPattern().toFloatArray(), 
+                drawer.setStroke( new BasicStroke(stroke.getLineWidth(), stroke.getEndCap(), stroke.getLineJoin(),
+                        stroke.getMiterLimit(), lineDashPattern.getCOSDashPattern().toFloatArray(),
                         lineDashPattern.getPhaseStart()) );
             }
         }
     }
-    
+
 }

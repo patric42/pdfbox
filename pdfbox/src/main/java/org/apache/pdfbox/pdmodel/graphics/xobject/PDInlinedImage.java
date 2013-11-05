@@ -16,6 +16,10 @@
  */
 package org.apache.pdfbox.pdmodel.graphics.xobject;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.Color;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
@@ -32,6 +36,8 @@ import java.util.Map;
 import org.apache.pdfbox.filter.Filter;
 import org.apache.pdfbox.filter.FilterManager;
 import org.apache.pdfbox.pdmodel.graphics.color.PDColorSpace;
+import org.apache.pdfbox.pdmodel.graphics.color.PDColorState;
+import org.apache.pdfbox.pdmodel.graphics.PDGraphicsState;
 import org.apache.pdfbox.util.ImageParameters;
 
 /**
@@ -44,6 +50,8 @@ public class PDInlinedImage
 {
     private ImageParameters params;
     private byte[] imageData;
+    private boolean mask;
+    private PDColorState maskBackground;
 
     /**
      * This will get the image parameters.
@@ -85,6 +93,21 @@ public class PDInlinedImage
         imageData = value;
     }
 
+    public void setMaskBackground(PDColorState cs)
+    {
+        maskBackground = cs;
+    }
+
+    public void setMask(boolean im)
+    {
+       mask=im;
+    }
+
+    public boolean isMask()
+    {
+       return mask;
+    }
+
     /**
      * This will take the inlined image information and create a java.awt.Image from
      * it.
@@ -101,7 +124,7 @@ public class PDInlinedImage
     /**
      * This will take the inlined image information and create a java.awt.Image from
      * it.
-     * 
+     *
      * @param colorSpaces The ColorSpace dictionary from the current resources, if any.
      *
      * @return The image that this object represents.
@@ -198,6 +221,26 @@ public class PDInlinedImage
         BufferedImage image = new BufferedImage(
                 colorModel, raster, false, null );
         image.setData( raster );
+
+        if (mask)
+        {
+            image=imageMask(image);
+        }
         return image;
     }
+
+    public BufferedImage imageMask(BufferedImage image) throws IOException
+    {
+        BufferedImage maskedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = (Graphics2D)maskedImage.getGraphics();
+        if (maskBackground!=null)
+        {
+            graphics.setColor(maskBackground.getJavaColor());
+        }
+        graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+        graphics.setComposite(AlphaComposite.DstIn);
+        graphics.drawImage(image, null, 0, 0);
+        return maskedImage;
+    }
+
 }

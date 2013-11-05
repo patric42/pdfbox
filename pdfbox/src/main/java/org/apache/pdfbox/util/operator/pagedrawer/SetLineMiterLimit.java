@@ -54,7 +54,7 @@ public class SetLineMiterLimit extends org.apache.pdfbox.util.operator.SetLineMi
         }
         else
         {
-            drawer.setStroke( new BasicStroke(stroke.getLineWidth(), stroke.getEndCap(), stroke.getLineJoin(), 
+            drawer.setStroke( new BasicStroke(stroke.getLineWidth(), stroke.getEndCap(), stroke.getLineJoin(),
                     miterLimit, null, 0.0f));
         }
     }

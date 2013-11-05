@@ -29,15 +29,15 @@ import org.apache.pdfbox.util.ResourceLoader;
  *  @version $Revision: 1.0 $
  */
 
-public class FontManager 
+public class FontManager
 {
 
     // HashMap with all known fonts
     private static HashMap<String,java.awt.Font> envFonts = new HashMap<String,java.awt.Font>();
     // the standard font
     private final static String standardFont = "helvetica";
-    private static Properties fontMapping = new Properties(); 
-    
+    private static Properties fontMapping = new Properties();
+
     static {
         try
         {
@@ -54,30 +54,30 @@ public class FontManager
         loadBasefontMapping();
         loadFontMapping();
     }
-    
-    private FontManager() 
+
+    private FontManager()
     {
     }
     /**
-     * Get the standard font from the environment, usually Arial or Times New Roman. 
+     * Get the standard font from the environment, usually Arial or Times New Roman.
      *
-     * @return The standard font 
-     * 
+     * @return The standard font
+     *
      */
-    public static java.awt.Font getStandardFont() 
+    public static java.awt.Font getStandardFont()
     {
         return getAwtFont(standardFont);
     }
-    
+
     /**
      * Get the font for the given fontname.
      *
      * @param font The name of the font.
      *
      * @return The font we are looking for or a similar font or null if nothing is found.
-     * 
+     *
      */
-    public static java.awt.Font getAwtFont(String font) 
+    public static java.awt.Font getAwtFont(String font)
     {
         String fontname = normalizeFontname(font);
         if (envFonts.containsKey(fontname))
@@ -90,32 +90,32 @@ public class FontManager
     /**
      * Load all available fonts from the environment.
      */
-    private static void loadFonts() 
+    private static void loadFonts()
     {
         java.awt.Font[] allFonts = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
         int numberOfFonts = allFonts.length;
-        for (int i=0;i<numberOfFonts;i++) 
+        for (int i=0;i<numberOfFonts;i++)
         {
             java.awt.Font font = allFonts[i];
             String family = normalizeFontname(font.getFamily());
             String psname = normalizeFontname(font.getPSName());
-            if (isBoldItalic(font)) 
+            if (isBoldItalic(font))
             {
                 envFonts.put(family+"bolditalic", font);
             }
-            else if (isBold(font)) 
+            else if (isBold(font))
             {
                 envFonts.put(family+"bold", font);
             }
-            else if (isItalic(font)) 
+            else if (isItalic(font))
             {
                 envFonts.put(family+"italic", font);
             }
-            else 
-            { 
+            else
+            {
                 envFonts.put(family, font);
             }
-            if (!family.equals(psname)) 
+            if (!family.equals(psname))
             {
                 envFonts.put(normalizeFontname(font.getPSName()),font);
             }
@@ -128,9 +128,9 @@ public class FontManager
      * @param fontname The name of the font.
      *
      * @return The normalized name of the font.
-     * 
+     *
      */
-    private static String normalizeFontname(String fontname) 
+    private static String normalizeFontname(String fontname)
     {
         // Terminate all whitespaces, commas and hyphens
         String normalizedFontname = fontname.toLowerCase().replaceAll(" ","").replaceAll(",","").replaceAll("-","");
@@ -157,17 +157,17 @@ public class FontManager
         }
         return normalizedFontname;
     }
-    
-    
+
+
     /**
      * Add a font-mapping.
      *
      * @param font The name of the font.
      *
      * @param mappedName The name of the mapped font.
-     * 
+     *
      */
-    private static boolean addFontMapping(String font, String mappedName) 
+    private static boolean addFontMapping(String font, String mappedName)
     {
         String fontname = normalizeFontname(font);
         // is there already a font mapping ?
@@ -184,21 +184,21 @@ public class FontManager
         envFonts.put(fontname, envFonts.get(mappedFontname));
         return true;
     }
-    
+
     /**
      * Load the mapping for the well knwon font-substitutions.
      *
      */
-    private static void loadFontMapping() 
+    private static void loadFontMapping()
     {
         boolean addedMapping = true;
-        // There could be some recursive mappings in the fontmapping, so that we have to 
-        // read the list until no more additional mapping is added to it 
-        while (addedMapping) 
+        // There could be some recursive mappings in the fontmapping, so that we have to
+        // read the list until no more additional mapping is added to it
+        while (addedMapping)
         {
             int counter = 0;
             Enumeration<Object> keys = fontMapping.keys();
-            while (keys.hasMoreElements()) 
+            while (keys.hasMoreElements())
             {
                 String key = (String)keys.nextElement();
                 if (addFontMapping(key,(String)fontMapping.get(key)))
@@ -216,7 +216,7 @@ public class FontManager
     /**
      * Mapping for the basefonts.
      */
-    private static void loadBasefontMapping() 
+    private static void loadBasefontMapping()
     {
         // use well known substitutions if the environments doesn't provide native fonts for the 14 standard fonts
         // Times-Roman -> Serif
@@ -282,11 +282,11 @@ public class FontManager
      *
      * @return font has BOLD and ITALIC-type or not
      */
-    private static boolean isBoldItalic(java.awt.Font font) 
+    private static boolean isBoldItalic(java.awt.Font font)
     {
         return isBold(font) && isItalic(font);
     }
-    
+
     /**
      * Try to determine if the font has a BOLD-type.
      *
@@ -294,7 +294,7 @@ public class FontManager
      *
      * @return font has BOLD-type or not
      */
-    private static boolean isBold(java.awt.Font font) 
+    private static boolean isBold(java.awt.Font font)
     {
         String name = font.getName().toLowerCase();
         if (name.indexOf("bold") > -1)
@@ -308,7 +308,7 @@ public class FontManager
         }
         return false;
     }
-    
+
     /**
      * Try to determine if the font has an ITALIC-type.
      *
@@ -316,7 +316,7 @@ public class FontManager
      *
      * @return font has ITALIC-type or not
      */
-    private static boolean isItalic(java.awt.Font font) 
+    private static boolean isItalic(java.awt.Font font)
     {
         String name = font.getName().toLowerCase();
         // oblique is the same as italic

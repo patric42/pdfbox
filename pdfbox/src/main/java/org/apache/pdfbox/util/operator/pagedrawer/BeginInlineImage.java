@@ -61,9 +61,11 @@ public class BeginInlineImage extends OperatorProcessor
         PDInlinedImage image = new PDInlinedImage();
         image.setImageParameters( params );
         image.setImageData( operator.getImageData() );
+        image.setMask(operator.getImageParameters().getDictionary().getBoolean("IM",false));
+        image.setMaskBackground(drawer.getGraphicsState().getNonStrokingColor());
         BufferedImage awtImage = image.createImage( context.getColorSpaces() );
 
-        if (awtImage == null) 
+        if (awtImage == null)
         {
             log.warn("BeginInlineImage.process(): createImage returned NULL");
             return;
@@ -71,7 +73,7 @@ public class BeginInlineImage extends OperatorProcessor
         int imageWidth = awtImage.getWidth();
         int imageHeight = awtImage.getHeight();
         double pageHeight = drawer.getPageSize().getHeight();
-        
+
         Matrix ctm = drawer.getGraphicsState().getCurrentTransformationMatrix();
         int pageRotation = page.findRotation();
 
@@ -85,13 +87,13 @@ public class BeginInlineImage extends OperatorProcessor
         // tan = sin/cos
         double angle = Math.atan(ctmAT.getShearX()/ctmAT.getScaleX());
         Matrix translationMatrix = null;
-        if (pageRotation == 0 || pageRotation == 180) 
+        if (pageRotation == 0 || pageRotation == 180)
         {
-            translationMatrix = Matrix.getTranslatingInstance((float)(Math.sin(angle)*ctm.getXScale()), (float)(pageHeight-2*ctm.getYPosition()-Math.cos(angle)*ctm.getYScale())); 
+            translationMatrix = Matrix.getTranslatingInstance((float)(Math.sin(angle)*ctm.getXScale()), (float)(pageHeight-2*ctm.getYPosition()-Math.cos(angle)*ctm.getYScale()));
         }
-        else if (pageRotation == 90 || pageRotation == 270) 
+        else if (pageRotation == 90 || pageRotation == 270)
         {
-            translationMatrix = Matrix.getTranslatingInstance((float)(Math.sin(angle)*ctm.getYScale()), (float)(pageHeight-2*ctm.getYPosition())); 
+            translationMatrix = Matrix.getTranslatingInstance((float)(Math.sin(angle)*ctm.getYScale()), (float)(pageHeight-2*ctm.getYPosition()));
         }
         rotationMatrix = rotationMatrix.multiply(translationMatrix);
         rotationMatrix.setValue(0, 1, (-1)*rotationMatrix.getValue(0, 1));
@@ -101,6 +103,6 @@ public class BeginInlineImage extends OperatorProcessor
                 rotationMatrix.getValue(1,0), rotationMatrix.getValue( 1, 1),
                 rotationMatrix.getValue(2,0),rotationMatrix.getValue(2,1)
                 );
-        drawer.drawImage(awtImage, at);
+        drawer.drawImage(awtImage, at, image.isMask());
     }
 }

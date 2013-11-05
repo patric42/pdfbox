@@ -92,7 +92,7 @@ public class PDType1CFont extends PDSimpleFont
     private static final byte[] SPACE_BYTES = {(byte)32};
 
     private COSDictionary fontDict = null;
-    
+
     /**
      * Constructor.
      * @param fontDictionary the corresponding dictionary
@@ -118,7 +118,7 @@ public class PDType1CFont extends PDSimpleFont
 
         return character;
     }
-    
+
     public int encodeToCID( byte[] bytes, int offset, int length )
     {
       if (length > 2)
@@ -132,12 +132,12 @@ public class PDType1CFont extends PDSimpleFont
       }
       return code;
     }
-    
+
     private String getCharacter( byte[] bytes, int offset, int length )
     {
         int code = encodeToCID(bytes, offset, length);
         if (code == -1) {
-        	return null;
+         return null;
         }
         return (String)this.codeToCharacter.get(code);
     }
@@ -194,7 +194,7 @@ public class PDType1CFont extends PDSimpleFont
         {
             return null;
         }
-        
+
         int code = bytes[offset] & 0xff;
         if (length == 2)
         {
@@ -288,7 +288,7 @@ public class PDType1CFont extends PDSimpleFont
 
     /**
      * {@inheritDoc}
-     */    
+     */
     public Font getawtFont() throws IOException
     {
         if (awtFont == null)
@@ -297,8 +297,8 @@ public class PDType1CFont extends PDSimpleFont
         }
         return awtFont;
     }
-    
-    private FontMetric getFontMetric() 
+
+    private FontMetric getFontMetric()
     {
         if (fontMetric == null)
         {
@@ -324,16 +324,16 @@ public class PDType1CFont extends PDSimpleFont
         String baseFontName = getBaseFont();
         if (fonts.size() > 1 && baseFontName != null)
         {
-            for (CFFFont font: fonts) 
+            for (CFFFont font: fonts)
             {
-                if (baseFontName.equals(font.getName())) 
+                if (baseFontName.equals(font.getName()))
                 {
                     this.cffFont = font;
                     break;
                 }
             }
         }
-        if (this.cffFont == null) 
+        if (this.cffFont == null)
         {
             this.cffFont = (CFFFont)fonts.get(0);
         }
@@ -509,8 +509,8 @@ public class PDType1CFont extends PDSimpleFont
             {
                 COSNumber number = (COSNumber)element;
                 code = Integer.valueOf(number.intValue());
-            } 
-            else 
+            }
+            else
             {
                 if( element instanceof COSName )
                 {
@@ -523,7 +523,7 @@ public class PDType1CFont extends PDSimpleFont
         return result;
     }
 
-    
+
     private static String hexString( int code, int length )
     {
         String string = Integer.toHexString(code);

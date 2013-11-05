@@ -57,14 +57,14 @@ public class StrokePath extends OperatorProcessor
         try
         {
             PageDrawer drawer = (PageDrawer)context;
-    
+
             float lineWidth = (float)context.getGraphicsState().getLineWidth();
             Matrix ctm = context.getGraphicsState().getCurrentTransformationMatrix();
-            if ( ctm != null && ctm.getXScale() > 0) 
+            if ( ctm != null && ctm.getXScale() > 0)
             {
                 lineWidth = lineWidth * ctm.getXScale();
             }
-            
+
             BasicStroke stroke = (BasicStroke)drawer.getStroke();
             if (stroke == null)
             {
@@ -72,7 +72,7 @@ public class StrokePath extends OperatorProcessor
             }
             else
             {
-                drawer.setStroke( new BasicStroke(lineWidth, stroke.getEndCap(), stroke.getLineJoin(), 
+                drawer.setStroke( new BasicStroke(lineWidth, stroke.getEndCap(), stroke.getLineJoin(),
                         stroke.getMiterLimit(), stroke.getDashArray(), stroke.getDashPhase()) );
             }
             drawer.strokePath();

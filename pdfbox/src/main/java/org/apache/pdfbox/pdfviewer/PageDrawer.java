@@ -16,6 +16,7 @@
  */
 package org.apache.pdfbox.pdfviewer;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
@@ -29,6 +30,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +75,7 @@ public class PageDrawer extends PDFStreamEngine
     private static final Log LOG = LogFactory.getLog(PageDrawer.class);
 
     private Graphics2D graphics;
-    
+
     /**
      * clipping winding rule used for the clipping path.
      */
@@ -130,9 +132,9 @@ public class PageDrawer extends PDFStreamEngine
         graphics.setRenderingHint( RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY );
         graphics.setRenderingHint( RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY );
         graphics.setRenderingHint( RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE );
-        // Only if there is some content, we have to process it. 
+        // Only if there is some content, we have to process it.
         // Otherwise we are done here and we will produce an empty page
-        if ( page.getContents() != null) 
+        if ( page.getContents() != null)
         {
             PDResources resources = page.findResources();
             processStream( page, resources, page.getContents().getStream() );
@@ -151,23 +153,23 @@ public class PageDrawer extends PDFStreamEngine
                     appearanceName = "default";
                 }
                 Map<String, PDAppearanceStream> appearanceMap = appearDictionary.getNormalAppearance();
-                if (appearanceMap != null) 
-                { 
-                    PDAppearanceStream appearance = 
-                        (PDAppearanceStream)appearanceMap.get( appearanceName ); 
-                    if( appearance != null ) 
-                    { 
+                if (appearanceMap != null)
+                {
+                    PDAppearanceStream appearance =
+                        (PDAppearanceStream)appearanceMap.get( appearanceName );
+                    if( appearance != null )
+                    {
                         Point2D point = new Point2D.Float(rect.getLowerLeftX(), rect.getLowerLeftY());
                         Matrix matrix = appearance.getMatrix();
-                        if (matrix != null) 
+                        if (matrix != null)
                         {
-                            // transform the rectangle using the given matrix 
+                            // transform the rectangle using the given matrix
                             AffineTransform at = matrix.createAffineTransform();
                             at.transform(point, point);
                         }
                         g.translate( (int)point.getX(), -(int)point.getY() );
-                        processSubStream( page, appearance.getResources(), appearance.getStream() ); 
-                        g.translate( -(int)point.getX(), (int)point.getY() ); 
+                        processSubStream( page, appearance.getResources(), appearance.getStream() );
+                        g.translate( -(int)point.getX(), (int)point.getY() );
                     }
                 }
             }
@@ -188,7 +190,7 @@ public class PageDrawer extends PDFStreamEngine
             PDGraphicsState graphicsState = getGraphicsState();
             Composite composite;
             Paint paint;
-            switch(graphicsState.getTextState().getRenderingMode()) 
+            switch(graphicsState.getTextState().getRenderingMode())
             {
                 case PDTextState.RENDERING_MODE_FILL_TEXT:
                     composite = graphicsState.getNonStrokeJavaComposite();
@@ -226,7 +228,7 @@ public class PageDrawer extends PDFStreamEngine
             }
             graphics.setComposite(composite);
             graphics.setPaint(paint);
-            
+
             PDFont font = text.getFont();
             Matrix textPos = text.getTextPos().copy();
             float x = textPos.getXPosition();
@@ -326,7 +328,7 @@ public class PageDrawer extends PDFStreamEngine
      * Fill the path.
      *
      * @param windingRule The winding rule this path will use.
-     * 
+     *
      * @throws IOException If there is an IO error while filling the path.
      */
     public void fillPath(int windingRule) throws IOException
@@ -356,7 +358,7 @@ public class PageDrawer extends PDFStreamEngine
      * This will set the current stroke.
      *
      * @param newStroke The current stroke.
-     * 
+     *
      */
     public void setStroke(BasicStroke newStroke)
     {
@@ -367,13 +369,13 @@ public class PageDrawer extends PDFStreamEngine
      * This will return the current stroke.
      *
      * @return The current stroke.
-     * 
+     *
      */
     public BasicStroke getStroke()
     {
         return (BasicStroke)getGraphics().getStroke();
     }
-    
+
     /**
      * Stroke the path.
      *
@@ -421,7 +423,7 @@ public class PageDrawer extends PDFStreamEngine
      */
     public java.awt.geom.Point2D.Double transformedPoint(double x, double y)
     {
-        double[] position = {x,y}; 
+        double[] position = {x,y};
         getGraphicsState().getCurrentTransformationMatrix().createAffineTransform().transform(
                 position, 0, position, 0, 1);
         position[1] = fixY(position[1]);
@@ -432,20 +434,20 @@ public class PageDrawer extends PDFStreamEngine
      * Set the clipping Path.
      *
      * @param windingRule The winding rule this path will use.
-     * 
+     *
      * @deprecated use {@link #setClippingWindingRule(int)} instead
-     * 
+     *
      */
     public void setClippingPath(int windingRule)
     {
         setClippingWindingRule(windingRule);
     }
-    
+
     /**
      * Set the clipping winding rule.
      *
      * @param windingRule The winding rule which will be used for clipping.
-     * 
+     *
      */
     public void setClippingWindingRule(int windingRule)
     {
@@ -464,14 +466,14 @@ public class PageDrawer extends PDFStreamEngine
             GeneralPath clippingPath = (GeneralPath)getLinePath().clone();
             clippingPath.setWindingRule(clippingWindingRule);
             // If there is already set a clipping path, we have to intersect the new with the existing one
-            if (graphicsState.getCurrentClippingPath() != null) 
+            if (graphicsState.getCurrentClippingPath() != null)
             {
                 Area currentArea = new Area(getGraphicsState().getCurrentClippingPath());
                 Area newArea = new Area(clippingPath);
                 currentArea.intersect(newArea);
                 graphicsState.setCurrentClippingPath(currentArea);
             }
-            else 
+            else
             {
                 graphicsState.setCurrentClippingPath(clippingPath);
             }
@@ -485,29 +487,42 @@ public class PageDrawer extends PDFStreamEngine
      *
      * @param awtImage The image to draw.
      * @param at The transformation to use when drawing.
-     * 
+     *
      */
     public void drawImage(Image awtImage, AffineTransform at)
     {
-        graphics.setComposite(getGraphicsState().getStrokeJavaComposite());
+        drawImage(awtImage,at,false);
+    }
+
+    public void drawImage(Image awtImage, AffineTransform at, boolean mask)
+    {
+        PDGraphicsState gs=getGraphicsState();
+        if (mask)
+        {
+            graphics.setComposite(AlphaComposite.SrcOver.derive(0.5f));
+        }
+        else
+        {
+            graphics.setComposite(getGraphicsState().getStrokeJavaComposite());
+        }
         graphics.setClip(getGraphicsState().getCurrentClippingPath());
         graphics.drawImage( awtImage, at, null );
     }
-    
+
     /**
      * Fill with Shading.  Called by SHFill operator.
      *
      * @param ShadingName  The name of the Shading Dictionary to use for this fill instruction.
      *
      * @throws IOException If there is an IO error while shade-filling the path/clipping area.
-     * 
+     *
      * @deprecated use {@link #shFill(COSName)} instead.
      */
     public void SHFill(COSName ShadingName) throws IOException
     {
         shFill(ShadingName);
     }
-    
+
     /**
      * Fill with Shading.  Called by SHFill operator.
      *
@@ -550,7 +565,7 @@ public class PageDrawer extends PDFStreamEngine
         graphics.fill( getGraphicsState().getCurrentClippingPath() );
     }
     /**
-     * Fill with a Function-based gradient / shading.  
+     * Fill with a Function-based gradient / shading.
      * If extending the class, override this and its siblings, not the public SHFill method.
      *
      * @param Shading  The Shading Dictionary to use for this fill instruction.
@@ -563,7 +578,7 @@ public class PageDrawer extends PDFStreamEngine
     }
 
     /**
-     * Fill with an Axial Shading.  
+     * Fill with an Axial Shading.
      * If extending the class, override this and its siblings, not the public SHFill method.
      *
      * @param Shading  The Shading Dictionary to use for this fill instruction.
@@ -573,11 +588,11 @@ public class PageDrawer extends PDFStreamEngine
     protected void SHFill_Axial(PDShading Shading) throws IOException
     {
         throw new IOException("Not Implemented");
-        
+
     }
 
     /**
-     * Fill with a Radial gradient / shading.  
+     * Fill with a Radial gradient / shading.
      * If extending the class, override this and its siblings, not the public SHFill method.
      *
      * @param Shading  The Shading Dictionary to use for this fill instruction.
@@ -588,7 +603,7 @@ public class PageDrawer extends PDFStreamEngine
     {
         throw new IOException("Not Implemented");
     }
-    
+
     /**
      * Fill with a Free-form Gourad-shaded triangle mesh.
      * If extending the class, override this and its siblings, not the public SHFill method.
@@ -601,7 +616,7 @@ public class PageDrawer extends PDFStreamEngine
     {
         throw new IOException("Not Implemented");
     }
-    
+
     /**
      * Fill with a Lattice-form Gourad-shaded triangle mesh.
      * If extending the class, override this and its siblings, not the public SHFill method.
@@ -614,7 +629,7 @@ public class PageDrawer extends PDFStreamEngine
     {
         throw new IOException("Not Implemented");
     }
-    
+
     /**
      * Fill with a Coons patch mesh
      * If extending the class, override this and its siblings, not the public SHFill method.
@@ -627,7 +642,7 @@ public class PageDrawer extends PDFStreamEngine
     {
         throw new IOException("Not Implemented");
     }
-    
+
     /**
      * Fill with a Tensor-product patch mesh.
      * If extending the class, override this and its siblings, not the public SHFill method.

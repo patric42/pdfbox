@@ -157,11 +157,11 @@ public class PDType1Font extends PDSimpleFont
             PDStream fontFile3 = ((PDFontDescriptorDictionary)fd).getFontFile3();
             if (fontFile3 != null)
             {
-                try 
+                try
                 {
                     type1CFont = new PDType1CFont( super.font );
                 }
-                catch (IOException exception) 
+                catch (IOException exception)
                 {
                     log.info("Can't read the embedded type1C font " + fd.getFontName() );
                 }
@@ -224,12 +224,12 @@ public class PDType1Font extends PDSimpleFont
                     PDFontDescriptorDictionary fdDictionary = (PDFontDescriptorDictionary)fd;
                     if( fdDictionary.getFontFile() != null )
                     {
-                        try 
+                        try
                         {
                             // create a type1 font with the embedded data
                             awtFont = Font.createFont( Font.TYPE1_FONT, fdDictionary.getFontFile().createInputStream() );
-                        } 
-                        catch (FontFormatException e) 
+                        }
+                        catch (FontFormatException e)
                         {
                             log.info("Can't read the embedded type1 font " + fd.getFontName() );
                         }
@@ -248,7 +248,7 @@ public class PDType1Font extends PDSimpleFont
                 {
                     // check if the font is part of our environment
                     awtFont = FontManager.getAwtFont(baseFont);
-                    if (awtFont == null) 
+                    if (awtFont == null)
                     {
                         log.info("Can't find the specified basefont " + baseFont );
                     }
@@ -279,7 +279,7 @@ public class PDType1Font extends PDSimpleFont
         }
         getEncodingFromFont(getFontEncoding() == null);
     }
-    
+
     /**
      * Tries to get the encoding for the type1 font.
      *
@@ -295,10 +295,10 @@ public class PDType1Font extends PDSimpleFont
             if( fontFile != null )
             {
                 BufferedReader in = null;
-                try 
+                try
                 {
                     in = new BufferedReader(new InputStreamReader(fontFile.createInputStream()));
-                    
+
                     // this section parses the font program stream searching for a /Encoding entry
                     // if it contains an array of values a Type1Encoding will be returned
                     // if it encoding contains an encoding name the corresponding Encoding will be returned
@@ -306,16 +306,16 @@ public class PDType1Font extends PDSimpleFont
                     Type1Encoding encoding = null;
                     while( (line = in.readLine()) != null)
                     {
-                        if (extractEncoding) 
+                        if (extractEncoding)
                         {
                             if (line.startsWith("currentdict end")) {
                                 if (encoding != null)
                                     setFontEncoding(encoding);
                                 break;
                             }
-                            if (line.startsWith("/Encoding")) 
+                            if (line.startsWith("/Encoding"))
                             {
-                                if(line.contains("array")) 
+                                if(line.contains("array"))
                                 {
                                     StringTokenizer st = new StringTokenizer(line);
                                     // ignore the first token
@@ -357,7 +357,7 @@ public class PDType1Font extends PDSimpleFont
                                 }
                                 catch(NumberFormatException exception)
                                 {
-                                    // there are (tex?)-some fonts containing postscript code like the following, 
+                                    // there are (tex?)-some fonts containing postscript code like the following,
                                     // which has to be ignored, see PDFBOX-1481
                                     // dup dup 161 10 getinterval 0 exch putinterval ....
                                     log.debug("Malformed encoding definition ignored (line="+line+")");
@@ -378,7 +378,7 @@ public class PDType1Font extends PDSimpleFont
                                 COSArray array = new COSArray();
                                 if (st.countTokens() >= 6)
                                 {
-                                    try 
+                                    try
                                     {
                                         for (int i=0;i<6;i++)
                                         {
@@ -429,7 +429,7 @@ public class PDType1Font extends PDSimpleFont
                         }
                     }
                 }
-                catch(IOException exception) 
+                catch(IOException exception)
                 {
                     log.error("Error: Could not extract the encoding from the embedded type1 font.");
                 }
@@ -441,7 +441,7 @@ public class PDType1Font extends PDSimpleFont
                         {
                             in.close();
                         }
-                        catch(IOException exception) 
+                        catch(IOException exception)
                         {
                             log.error("An error occurs while closing the stream used to read the embedded type1 font.");
                         }
@@ -466,7 +466,7 @@ public class PDType1Font extends PDSimpleFont
             return super.encode(c, offset, length);
         }
     }
-    
+
     public int encodeToCID( byte[] c, int offset, int length ) throws IOException {
       if (type1CFont != null && getFontEncoding() == null)
       {

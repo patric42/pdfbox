@@ -57,7 +57,7 @@ public class SetLineWidth extends org.apache.pdfbox.util.operator.SetLineWidth
         }
         else
         {
-            drawer.setStroke( new BasicStroke(lineWidth, stroke.getEndCap(), stroke.getLineJoin(), 
+            drawer.setStroke( new BasicStroke(lineWidth, stroke.getEndCap(), stroke.getLineJoin(),
                     stroke.getMiterLimit(), stroke.getDashArray(), stroke.getDashPhase()) );
         }
     }
