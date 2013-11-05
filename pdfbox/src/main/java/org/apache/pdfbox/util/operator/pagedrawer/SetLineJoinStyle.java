@@ -29,7 +29,7 @@ import java.io.IOException;
 /**
  * Implementation of content stream operator for page drawer.
  *
- * @author <a href="mailto:andreas@lehmi.de>Andreas Lehmkühler</a>
+ * @author <a href="mailto:andreas@lehmi.de>Andreas Lehmkühler"</a>
  * @version $Revision: 1.0 $
  */
 public class SetLineJoinStyle extends org.apache.pdfbox.util.operator.SetLineJoinStyle
