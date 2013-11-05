@@ -333,7 +333,7 @@ public class PageDrawer extends PDFStreamEngine
         }
         graphics.setPaint( nonStrokingPaint );
         getLinePath().setWindingRule(windingRule);
-        graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF );
+        //graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF );
         graphics.setClip(getGraphicsState().getCurrentClippingPath());
         graphics.fill( getLinePath() );
         getLinePath().reset();
@@ -382,7 +382,7 @@ public class PageDrawer extends PDFStreamEngine
             strokingPaint = Color.WHITE;
         }
         graphics.setPaint(strokingPaint);
-        graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF );
+        //graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF );
         graphics.setClip(getGraphicsState().getCurrentClippingPath());
         GeneralPath path = getLinePath();
         graphics.draw( path );
@@ -534,7 +534,7 @@ public class PageDrawer extends PDFStreamEngine
         }
         graphics.setComposite(getGraphicsState().getNonStrokeJavaComposite());
         graphics.setPaint(paint);
-        graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF );
+        //graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF );
         graphics.fill( getGraphicsState().getCurrentClippingPath() );
     }
     /**
