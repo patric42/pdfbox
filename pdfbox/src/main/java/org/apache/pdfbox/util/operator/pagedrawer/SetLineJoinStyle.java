@@ -50,7 +50,7 @@ public class SetLineJoinStyle extends org.apache.pdfbox.util.operator.SetLineJoi
         BasicStroke stroke = (BasicStroke)drawer.getStroke();
         if (stroke == null)
         {
-            drawer.setStroke( new BasicStroke(1,BasicStroke.CAP_SQUARE,lineJoinStyle) );
+            drawer.setStroke( new BasicStroke(1,BasicStroke.CAP_BUTT,lineJoinStyle) );
         }
         else
         {

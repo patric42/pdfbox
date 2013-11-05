@@ -53,11 +53,11 @@ public class SetLineDashPattern extends org.apache.pdfbox.util.operator.SetLineD
         {
             if (lineDashPattern.isDashPatternEmpty()) 
             {
-                drawer.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f) );
+                drawer.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f) );
             }
             else
             {
-                drawer.setStroke(new BasicStroke(1, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER, 10.0f, 
+                drawer.setStroke(new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f,
                         lineDashPattern.getCOSDashPattern().toFloatArray(), lineDashPattern.getPhaseStart()) );
             }
         }

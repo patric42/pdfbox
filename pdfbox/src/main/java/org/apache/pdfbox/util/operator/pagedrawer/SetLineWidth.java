@@ -45,7 +45,7 @@ public class SetLineWidth extends org.apache.pdfbox.util.operator.SetLineWidth
     {
         super.process( operator, arguments );
         float lineWidth = (float)context.getGraphicsState().getLineWidth();
-        if (lineWidth == 0) 
+        if (lineWidth < 1)
         {
             lineWidth = 1;
         }
@@ -53,7 +53,7 @@ public class SetLineWidth extends org.apache.pdfbox.util.operator.SetLineWidth
         BasicStroke stroke = (BasicStroke)drawer.getStroke();
         if (stroke == null)
         {
-            drawer.setStroke( new BasicStroke( lineWidth ) );
+            drawer.setStroke( new BasicStroke( lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER ) );
         }
         else
         {

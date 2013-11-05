@@ -113,6 +113,7 @@ public class PageDrawer extends PDFStreamEngine
     public void drawPage( Graphics g, PDPage p, Dimension pageDimension ) throws IOException
     {
         graphics = (Graphics2D)g;
+        graphics.setStroke(new BasicStroke(10f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
         page = p;
         pageSize = pageDimension;
         graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );

@@ -68,7 +68,7 @@ public class StrokePath extends OperatorProcessor
             BasicStroke stroke = (BasicStroke)drawer.getStroke();
             if (stroke == null)
             {
-                drawer.setStroke( new BasicStroke( lineWidth ) );
+                drawer.setStroke( new BasicStroke( lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER ) );
             }
             else
             {
