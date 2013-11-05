@@ -276,6 +276,7 @@ public class ASCII85OutputStream extends FilterOutputStream
      *
      * @throws Throwable If there is an error.
      */
+    /* don't meddle with finalizers. If the user ain't flush, we won't either.
     protected void finalize() throws Throwable
     {
         try
@@ -287,4 +288,5 @@ public class ASCII85OutputStream extends FilterOutputStream
             super.finalize();
         }
     }
+    */
 }

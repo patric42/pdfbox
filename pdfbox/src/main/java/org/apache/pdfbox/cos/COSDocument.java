@@ -585,7 +585,7 @@ public class COSDocument extends COSBase
             {
                 LOG.warn( "Warning: You did not close a PDF Document" );
             }
-            close();
+            //close(); // don't close - this leads to *very* nasty errors in situations where Hotspot thinks it might call the finalizer early.
         }
     }
 
