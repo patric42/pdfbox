@@ -60,7 +60,7 @@ public abstract class PDSimpleFont extends PDFont
 
     private float avgFontWidth = 0.0f;
     private float avgFontHeight = 0.0f;
-    private float fontWidthOfSpace = -1f; 
+    private float fontWidthOfSpace = -1f;
 
     private static final byte[] SPACE_BYTES = { (byte)32 };
 
@@ -69,7 +69,7 @@ public abstract class PDSimpleFont extends PDFont
      * Log instance.
      */
     private static final Log LOG = LogFactory.getLog(PDSimpleFont.class);
-    
+
     /**
      * Constructor.
      */
@@ -90,8 +90,8 @@ public abstract class PDSimpleFont extends PDFont
 
     /**
     * Looks up, creates, returns  the AWT Font.
-    * 
-    * @return returns the awt font to bes used for rendering 
+    *
+    * @return returns the awt font to bes used for rendering
     * @throws IOException if something went wrong.
     */
     public Font getawtFont() throws IOException
@@ -99,11 +99,11 @@ public abstract class PDSimpleFont extends PDFont
         LOG.error("Not yet implemented:" + getClass().getName() );
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    public void drawString( String string, int[] codePoints, Graphics g, float fontSize, 
+    public void drawString( String string, int[] codePoints, Graphics g, float fontSize,
             AffineTransform at, float x, float y ) throws IOException
     {
         Font awtFont = getawtFont();
@@ -121,7 +121,7 @@ public abstract class PDSimpleFont extends PDFont
             }
             if((cid2Font != null && cid2Font.hasCIDToGIDMap()) || isFontSubstituted)
             {
-                // we still have to use the string if a CIDToGIDMap is used 
+                // we still have to use the string if a CIDToGIDMap is used
                 glyphs = awtFont.createGlyphVector(frc, string);
             }
             else
@@ -129,21 +129,24 @@ public abstract class PDSimpleFont extends PDFont
                 glyphs = awtFont.createGlyphVector(frc, codePoints);
             }
         }
-        else 
+        else
         {
             // mdavis - fix fontmanager.so/dll on sun.font.FileFont.getGlyphImage
             // for font with bad cmaps?
-            // Type1 fonts are not affected as they don't have cmaps
-            if (!isType1Font() && awtFont.canDisplayUpTo(string) != -1) 
+            // Type1 fonts are not affected as they don't have cmaps -> yes they are.
+            if (/*!isType1Font() &&*/ awtFont.canDisplayUpTo(string) != -1)
             {
-                LOG.warn("Changing font on <" + string + "> from <"
-                        + awtFont.getName() + "> to the default font");
+                if (awtFont.getNumGlyphs()>1)
+                {
+                    LOG.warn("Changing font on <" + string + "> from <"
+                            + awtFont.getName() + "> to the default font");
+                }
                 awtFont = Font.decode(null).deriveFont(1f);
             }
             glyphs = awtFont.createGlyphVector(frc, string);
         }
         Graphics2D g2d = (Graphics2D)g;
-        g2d.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+        //g2d.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
         writeFont(g2d, at, x, y, glyphs);
     }
 
@@ -285,7 +288,7 @@ public abstract class PDSimpleFont extends PDFont
         return average;
     }
 
-    
+
     /**
      * This will get the ToUnicode object.
      *
@@ -328,13 +331,13 @@ public abstract class PDSimpleFont extends PDFont
      * @param glyphs The GlyphVector containing the glyphs to be drawn.
      *
      */
-    protected void writeFont(final Graphics2D g2d, final AffineTransform at, 
-            final float x, final float y, final GlyphVector glyphs) 
+    protected void writeFont(final Graphics2D g2d, final AffineTransform at,
+            final float x, final float y, final GlyphVector glyphs)
     {
         // check if we have a rotation
-        if (!at.isIdentity()) 
+        if (!at.isIdentity())
         {
-            try 
+            try
             {
                 AffineTransform atInv = at.createInverse();
                 // do only apply the size of the transform, rotation will be realized by rotating the graphics,
@@ -349,12 +352,12 @@ public abstract class PDSimpleFont extends PDFont
                 // restore the original transformation
                 g2d.transform(atInv);
             }
-            catch (NoninvertibleTransformException e) 
+            catch (NoninvertibleTransformException e)
             {
                 LOG.error("Error in "+getClass().getName()+".writeFont",e);
             }
         }
-        else 
+        else
         {
             g2d.drawGlyphVector(glyphs, x, y);
         }
@@ -367,29 +370,29 @@ public abstract class PDSimpleFont extends PDFont
     {
         String cmapName = null;
         COSName encodingName = null;
-        COSBase encoding = getEncoding(); 
+        COSBase encoding = getEncoding();
         Encoding fontEncoding = null;
-        if (encoding != null) 
+        if (encoding != null)
         {
-            if (encoding instanceof COSName) 
+            if (encoding instanceof COSName)
             {
                 if (cmap == null)
                 {
                     encodingName = (COSName)encoding;
                     cmap = cmapObjects.get( encodingName.getName() );
-                    if (cmap == null) 
+                    if (cmap == null)
                     {
                         cmapName = encodingName.getName();
                     }
                 }
                 if (cmap == null && cmapName != null)
                 {
-                    try 
+                    try
                     {
                         fontEncoding =
                             EncodingManager.INSTANCE.getEncoding(encodingName);
                     }
-                    catch(IOException exception) 
+                    catch(IOException exception)
                     {
                         LOG.debug("Debug: Could not find encoding for " + encodingName );
                     }
@@ -400,23 +403,23 @@ public abstract class PDSimpleFont extends PDFont
                 if (cmap == null)
                 {
                     COSStream encodingStream = (COSStream)encoding;
-                    try 
+                    try
                     {
                         cmap = parseCmap( null, encodingStream.getUnfilteredStream() );
                     }
-                    catch(IOException exception) 
+                    catch(IOException exception)
                     {
                         LOG.error("Error: Could not parse the embedded CMAP" );
                     }
                 }
             }
-            else if (encoding instanceof COSDictionary) 
+            else if (encoding instanceof COSDictionary)
             {
-                try 
+                try
                 {
                     fontEncoding = new DictionaryEncoding((COSDictionary)encoding);
                 }
-                catch(IOException exception) 
+                catch(IOException exception)
                 {
                     LOG.error("Error: Could not create the DictionaryEncoding" );
                 }
@@ -425,10 +428,10 @@ public abstract class PDSimpleFont extends PDFont
         setFontEncoding(fontEncoding);
         extractToUnicodeEncoding();
 
-        if (cmap == null && cmapName != null) 
+        if (cmap == null && cmapName != null)
         {
             String resourceName = resourceRootCMAP + cmapName;
-            try 
+            try
             {
                 cmap = parseCmap( resourceRootCMAP, ResourceLoader.loadResource( resourceName ) );
                 if( cmap == null && encodingName == null)
@@ -436,7 +439,7 @@ public abstract class PDSimpleFont extends PDFont
                     LOG.error("Error: Could not parse predefined CMAP file for '" + cmapName + "'" );
                 }
             }
-            catch(IOException exception) 
+            catch(IOException exception)
             {
                 LOG.error("Error: Could not find predefined CMAP file for '" + cmapName + "'" );
             }
@@ -453,11 +456,11 @@ public abstract class PDSimpleFont extends PDFont
             setHasToUnicode(true);
             if ( toUnicode instanceof COSStream )
             {
-                try 
+                try
                 {
                     toUnicodeCmap = parseCmap( resourceRootCMAP, ((COSStream)toUnicode).getUnfilteredStream());
                 }
-                catch(IOException exception) 
+                catch(IOException exception)
                 {
                     LOG.error("Error: Could not load embedded ToUnicode CMap" );
                 }
@@ -466,15 +469,15 @@ public abstract class PDSimpleFont extends PDFont
             {
                 encodingName = (COSName)toUnicode;
                 toUnicodeCmap = cmapObjects.get( encodingName.getName() );
-                if (toUnicodeCmap == null) 
+                if (toUnicodeCmap == null)
                 {
                     cmapName = encodingName.getName();
                     String resourceName = resourceRootCMAP + cmapName;
-                    try 
+                    try
                     {
                         toUnicodeCmap = parseCmap( resourceRootCMAP, ResourceLoader.loadResource( resourceName ));
                     }
-                    catch(IOException exception) 
+                    catch(IOException exception)
                     {
                         LOG.error("Error: Could not find predefined ToUnicode CMap file for '" + cmapName + "'" );
                     }
@@ -486,23 +489,23 @@ public abstract class PDSimpleFont extends PDFont
             }
         }
     }
-    
+
     private boolean isFontSubstituted = false;
-    
+
     /**
      * This will get the value for isFontSubstituted, which indicates
      * if the font was substituted due to a problem with the embedded one.
-     * 
+     *
      * @return true if the font was substituted
      */
     protected boolean isFontSubstituted()
     {
         return isFontSubstituted;
     }
-    
+
     /**
      * This will set  the value for isFontSubstituted.
-     * 
+     *
      * @param isSubstituted true if the font was substituted
      */
     protected void setIsFontSubstituted(boolean isSubstituted)
@@ -518,9 +521,9 @@ public abstract class PDSimpleFont extends PDFont
         if (fontWidthOfSpace == -1f)
         {
             COSBase toUnicode = getToUnicode();
-            try 
+            try
             {
-                if (toUnicode != null) 
+                if (toUnicode != null)
                 {
                     int spaceMapping = toUnicodeCmap.getSpaceMapping();
                     if (spaceMapping > -1)
@@ -538,7 +541,7 @@ public abstract class PDSimpleFont extends PDFont
                     fontWidthOfSpace = getAverageFontWidth();
                 }
             }
-            catch (Exception e) 
+            catch (Exception e)
             {
                 LOG.error("Can't determine the width of the space character using 250 as default", e);
                 fontWidthOfSpace = 250f;
