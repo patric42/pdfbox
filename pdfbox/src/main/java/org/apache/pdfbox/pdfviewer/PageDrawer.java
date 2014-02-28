@@ -131,8 +131,21 @@ public class PageDrawer extends PDFStreamEngine
     {
         graphics = (Graphics2D) g;
         pageHeight = (int)pageSize.getHeight();
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+
+        Map dh = (Map)Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
+        if (dh!=null) {
+           graphics.setRenderingHints(dh);
+        }
+
+        graphics.setRenderingHint( RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON );
+        graphics.setRenderingHint( RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY );
+        graphics.setRenderingHint( RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE );
+        graphics.setRenderingHint( RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON );
+        graphics.setRenderingHint( RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC );
+        graphics.setRenderingHint( RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY );
+        graphics.setRenderingHint( RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY );
+        graphics.setRenderingHint( RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE );
+
         graphics.translate(0, pageHeight);
         graphics.scale(1, -1);
         // TODO use getStroke() to set the initial stroke
@@ -691,7 +704,7 @@ public class PageDrawer extends PDFStreamEngine
         }
         graphics.setPaint(nonStrokingPaint);
         linePath.setWindingRule(windingRule);
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        //dont do this graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
         graphics.setClip(getGraphicsState().getCurrentClippingPath());
         graphics.fill(linePath);
         linePath.reset();
