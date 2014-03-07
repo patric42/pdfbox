@@ -19,10 +19,15 @@ package org.apache.pdfbox.pdmodel.graphics.image;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Point;
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.apache.commons.logging.Log;
@@ -53,7 +58,6 @@ final class SampledImageReader
     {
         // get mask (this image)
         BufferedImage mask = getRGBImage(pdImage, null);
-
         // compose to ARGB
         BufferedImage masked = new BufferedImage(mask.getWidth(), mask.getHeight(),
                 BufferedImage.TYPE_INT_ARGB);
@@ -74,22 +78,22 @@ final class SampledImageReader
         WritableRaster raster = masked.getRaster();
         WritableRaster alpha = mask.getRaster();
 
-        float[] rgba = new float[4];
-        final float[] transparent = new float[4];
+//        int[] rgba = new int[4];
+        final int[] transparent = new int[4];
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
-                raster.getPixel(x, y, rgba);
+//                raster.getPixel(x, y, rgba);
 
-                if (alpha.getPixel(x, y, (float[])null)[0] == 255)
+                if (alpha.getPixel(x, y, (int[])null)[0] == 255)
                 {
                     raster.setPixel(x, y, transparent);
                 }
-                else
-                {
-                    raster.setPixel(x, y, rgba);
-                }
+//                else
+//                {
+//                    raster.setPixel(x, y, rgba);
+//                }
             }
         }
 
@@ -119,6 +123,7 @@ final class SampledImageReader
         final int height = pdImage.getHeight();
         final int bitsPerComponent = pdImage.getBitsPerComponent();
         final float[] decode = getDecodeArray(pdImage);
+        
 
         //
         // An AWT raster must use 8/16/32 bits per component. Images with < 8bpc
@@ -133,11 +138,54 @@ final class SampledImageReader
         ImageInputStream iis = null;
         try
         {
-            // create stream
-            iis = new MemoryCacheImageInputStream(pdImage.getStream().createInputStream());
-            final float sampleMax = (float)Math.pow(2, bitsPerComponent) - 1f;
-            final boolean isIndexed = colorSpace instanceof PDIndexed;
+          // create stream
+           iis = new MemoryCacheImageInputStream(pdImage.getStream().createInputStream());
+           final float sampleMax = (float)Math.pow(2, bitsPerComponent) - 1f;
+           final boolean isIndexed = colorSpace instanceof PDIndexed;
+           byte[] srcColorValues = new byte[numComponents];
+           byte[] alpha = new byte[1];
 
+           //on 1bit images, skip the color conversion..
+           if (numComponents == 1 && bitsPerComponent == 1) {
+              int rowlen = (width + 7) / 8;
+              byte[] buff = new byte[rowlen * height];
+              iis.readFully(buff);
+
+              for (int y = 0; y < height; y++) {
+                 for (int x = 0; x < width; x++) {
+                    //boolean isMasked = true;
+                    int boff = x >> 3;
+                    int bitmask = 1 << (7 - (x & 7));
+                    int value = (buff[y * rowlen + boff] & bitmask) > 0 ? 1 : 0;
+
+                    // decode array
+                    final float dMin = decode[0];
+                    final float dMax = decode[1];
+
+                    // interpolate to domain
+                    float output = dMin + (value * ((dMax - dMin) / sampleMax));
+
+                    if (isIndexed) {
+                       // indexed color spaces get the raw value, because the TYPE_BYTE
+                       // below cannot be reversed by the color space without it having
+                       // knowledge of the number of bits per component
+                       srcColorValues[0] = (byte) Math.round(output);
+                    } else {
+                       // interpolate to TYPE_BYTE
+                       int outputByte = Math.round(((output - Math.min(dMin, dMax))
+                               / Math.abs(dMax - dMin)) * 255f);
+                       srcColorValues[0] = (byte) outputByte;
+                    }
+                    raster.setDataElements(x, y, srcColorValues);
+                 }
+              }
+
+              ColorModel colorModel = new ComponentColorModel(ColorSpace.getInstance(ColorSpace.CS_GRAY), false, false, Transparency.OPAQUE, DataBuffer.TYPE_BYTE);
+              BufferedImage src = new BufferedImage(colorModel, raster, false, null);
+              return src;
+           }
+           
+           //original code
             // init color key mask
             float[] colorKeyRanges = null;
             BufferedImage colorKeyMask = null;
@@ -155,8 +203,9 @@ final class SampledImageReader
             }
 
             // read stream
-            byte[] srcColorValues = new byte[numComponents];
-            byte[] alpha = new byte[1];
+
+            
+            ////////////OLD///////////////
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
@@ -209,10 +258,13 @@ final class SampledImageReader
                 // rows are padded to the nearest byte
                 iis.readBits(padding);
             }
+            
+            
+            
+            /////////////////////////////////////7
 
             // use the color space to convert the image to RGB
             BufferedImage rgbImage = colorSpace.toRGBImage(raster);
-
             // apply color mask, if any
             if (colorKeyMask != null)
             {
